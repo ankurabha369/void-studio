@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
+import React, { useState, useEffect, useRef, createContext, useContext, Profiler } from 'react';
 import { Menu, X, ArrowUpRight, Github, Linkedin, Twitter, Sun, Moon, Send } from 'lucide-react';
+import ProfileDirectory from './components/profiledirectory';
+import ImageCarousel from './components/ImageCarousel';
 // --- REMOVED GSAP Imports ---
 // import { gsap } from 'gsap';
 // import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -15,10 +17,15 @@ const VOID_STUDIO_LOGO_URL = '/logo.png'; // CHANGE THIS to your logo path in /p
 // Place your images in the /public folder (e.g., /public/image1.png)
 // and update these paths.
 const FLOATING_IMAGE_URLS = [
-  '/shape-01.svg', // Assumes shape-01.svg is in /public
-  '/shape-02.svg', // Assumes shape-02.svg is in /public
-  '/shape-03.svg', // Assumes shape-03.svg is in /public
-  '/shape-04.svg', // Assumes shape-04.svg is in /public
+  './public/1.png', // Assumes shape-01.svg is in /public
+  './public/2.png', // Assumes shape-02.svg is in /public
+  './public/3.png', // Assumes shape-03.svg is in /public
+  './public/4.png', // Assumes shape-04.svg is in /public
+  './public/me.png', // Assumes shape-04.svg is in /public
+  './public/6.png', // Assumes shape-04.svg is in /public
+  './public/7.png', // Assumes shape-04.svg is in /public
+
+
 ];
 // --- End of new image URLs ---
 
@@ -26,7 +33,7 @@ const FLOATING_IMAGE_URLS = [
 const LogoDisplay = ({ id }) => (
   <img
     id={id}
-    src={VOID_STUDIO_LOGO_URL}
+    src={'./public/logo.png'} // Update path as needed
     alt="Void Studio Logo"
     className="h-full w-full object-contain dark:invert dark:brightness-[1.75]" // Adjust filter as needed based on your logo
     onError={(e) => e.target.src = 'https://placehold.co/100x40/000000/FFFFFF?text=Logo'} // Simple fallback
@@ -150,7 +157,7 @@ const Header = ({ gsapLoaded }) => { // --- ADDED BACK gsapLoaded prop ---
 
 
   return (
-    <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-md bg-white/50 dark:bg-black/50 border-b border-gray-300 dark:border-lime-500/20">
+    <header ref={headerRef} className="fixed top-0 left-0 my-3 mx-12 rounded-2xl right-0 z-50  backdrop-blur-md bg-white/50 dark:bg-black/50 border-b border-gray-300 dark:border-lime-500/20">
       <nav className="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
         <div className="flex items-center h-8 md:h-10">
           <LogoDisplay id="header-logo" />
@@ -279,9 +286,9 @@ const FloatingObject = ({ imageUrl, size, position, gsapLoaded }) => { // --- AD
   useEffect(() => {
     // --- ADDED CHECK ---
     if (gsapLoaded && objRef.current && window.gsap && window.gsap.utils) {
-      const randX = window.gsap.utils.random(-100, 100, 10);
-      const randY = window.gsap.utils.random(-100, 100, 10);
-      const randScale = window.gsap.utils.random(0.5, 1.5, 0.1);
+      const randX = window.gsap.utils.random(-100, 50, 10);
+      const randY = window.gsap.utils.random(-100, 90, 10);
+      const randScale = window.gsap.utils.random(0.5, 1.5, 0.8);
       const randRotate = window.gsap.utils.random(-360, 360, 30);
       const randDelay = window.gsap.utils.random(0.5, 1.5, 0.2);
       const randDuration = window.gsap.utils.random(10, 20, 1);
@@ -293,7 +300,7 @@ const FloatingObject = ({ imageUrl, size, position, gsapLoaded }) => { // --- AD
       const tl = window.gsap.timeline({ delay: randDelay });
       tl.to(objRef.current, {
         y: randY,
-        opacity: window.gsap.utils.random(0.3, 0.6),
+        opacity: window.gsap.utils.random(1, 1),
         duration: window.gsap.utils.random(1, 2, 0.5),
         ease: "power2.out"
       });
@@ -504,7 +511,7 @@ const Work = ({ gsapLoaded }) => { // --- ADDED BACK gsapLoaded prop ---
           A glimpse into the void. We don't just design; we create experiences.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {projects.map((project) => <ProjectCard key={project.title} {...project} gsapLoaded={gsapLoaded} />)} {/* Pass prop */}
+          {projects.map((project) => <ProjectCard key={project.title} {...project} gsapLoaded={gsapLoaded} />)} Pass prop
         </div>
       </div>
     </section>
@@ -512,47 +519,6 @@ const Work = ({ gsapLoaded }) => { // --- ADDED BACK gsapLoaded prop ---
 };
 
 
-// --- Team Card Component ---
-const TeamCard = ({ name, role, imageUrl, gsapLoaded }) => { // --- ADDED BACK gsapLoaded prop ---
-  const cardRef = useRef(null);
-  const { theme } = useContext(ThemeContext);
-
-  useEffect(() => {
-    // --- ADDED CHECK ---
-    if (gsapLoaded && window.gsap && window.ScrollTrigger) {
-      window.gsap.fromTo(cardRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", scrollTrigger: { trigger: cardRef.current, start: "top 90%", toggleActions: "play none none reverse" } }
-      );
-    }
-  }, [gsapLoaded]); // --- ADDED gsapLoaded ---
-
-  const handleMouseEnter = () => {
-    // --- ADDED CHECK ---
-    if (gsapLoaded && window.gsap) {
-      const borderColor = theme === 'dark' ? 'rgba(50, 205, 50, 0.8)' : 'rgba(101, 163, 13, 0.8)';
-      const shadowColor = theme === 'dark' ? 'rgba(50, 205, 50, 0.6)' : 'rgba(101, 163, 13, 0.5)';
-      window.gsap.to(cardRef.current, { scale: 1.05, duration: 0.3, border: `1px solid ${borderColor}` });
-      window.gsap.to(cardRef.current.querySelector('img'), { boxShadow: `0 0 15px ${shadowColor}`, duration: 0.3 });
-    }
-  };
-  const handleMouseLeave = () => {
-    // --- ADDED CHECK ---
-    if (gsapLoaded && window.gsap) {
-      const borderColor = theme === 'dark' ? 'rgba(50, 205, 50, 0.1)' : 'rgba(101, 163, 13, 0.1)';
-      window.gsap.to(cardRef.current, { scale: 1, duration: 0.3, border: `1px solid ${borderColor}` });
-      window.gsap.to(cardRef.current.querySelector('img'), { boxShadow: "none", duration: 0.3 });
-    }
-  };
-
-  return (
-    <div ref={cardRef} className="bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-lime-500/10 rounded-lg p-6 text-center cursor-pointer" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <img src={imageUrl} alt={name} className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-lime-500 dark:border-lime-400 object-cover" onError={(e) => e.target.src = 'https://placehold.co/200x200/111/FFF?text=AV'} />
-      <h3 className="text-gray-900 dark:text-white text-2xl font-bold">{name}</h3>
-      <p className="text-lime-600 dark:text-lime-400 font-semibold">{role}</p>
-    </div>
-  );
-};
 
 
 // --- Team Component ---
@@ -569,12 +535,6 @@ const Team = ({ gsapLoaded }) => { // --- ADDED BACK gsapLoaded prop ---
     }
   }, [gsapLoaded]); // --- ADDED gsapLoaded ---
 
-  const teamMembers = [
-    { name: "Alex 'Void' Chen", role: "Creative Director", imageUrl: "https://placehold.co/200x200/000000/34d399?text=AC" },
-    { name: "Jenna 'Pixel' Ray", role: "Lead UI/UX Designer", imageUrl: "https://placehold.co/200x200/222222/34d399?text=JR" },
-    { name: "Mike 'Glitch' Lee", role: "Motion Graphics Lead", imageUrl: "https://placehold.co/200x200/111111/34d399?text=ML" },
-    { name: "Sam 'Kern' Tobi", role: "Brand Strategist", imageUrl: "https://placehold.co/200x200/333333/34d399?text=ST" },
-  ];
 
   return (
     <section id="team" ref={teamSectionRef} className="py-24 bg-gray-50 dark:bg-gray-950">
@@ -582,8 +542,8 @@ const Team = ({ gsapLoaded }) => { // --- ADDED BACK gsapLoaded prop ---
         <h2 ref={teamTitleRef} className="text-5xl font-bold text-center text-gray-900 dark:text-white mb-16 font-heading">
           Meet the <span className="text-lime-600 dark:text-lime-400">Team</span>
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {teamMembers.map((member) => <TeamCard key={member.name} {...member} gsapLoaded={gsapLoaded} />)} {/* Pass prop */}
+        <div className="">
+          <ProfileDirectory gsapLoaded={gsapLoaded} /> {/* Pass prop */}
         </div>
       </div>
     </section>
@@ -754,6 +714,7 @@ function App() {
           <Hero gsapLoaded={gsapLoaded} /> {/* Pass prop */}
           <Work gsapLoaded={gsapLoaded} /> {/* Pass prop */}
           <Team gsapLoaded={gsapLoaded} /> {/* Pass prop */}
+          <p/>
           <Contact gsapLoaded={gsapLoaded} /> {/* Pass prop */}
         </main>
         <Footer gsapLoaded={gsapLoaded} /> {/* Pass prop */}
